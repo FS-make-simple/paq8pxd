@@ -1,3 +1,10 @@
+`ORG.FSMS:`
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/FS-make-simple/paq8pxd)
+![GitHub Release Date](https://img.shields.io/github/release-date/FS-make-simple/paq8pxd)
+![GitHub repo size](https://img.shields.io/github/repo-size/FS-make-simple/paq8pxd)
+![GitHub all releases](https://img.shields.io/github/downloads/FS-make-simple/paq8pxd/total)
+![GitHub](https://img.shields.io/github/license/FS-make-simple/paq8pxd)  
+
 # Paq8pxd
 
 To install and use in Windows:
@@ -14,12 +21,12 @@ progress.  When it is done you can close the window by pressing
 ENTER or clicking [X].
 
 
-# COMMAND LINE INTERFACE
+## COMMAND LINE INTERFACE
 
 - To install, put paq8pxd.exe somewhere in your PATH.
-- To compress:      paq8pxd [-N] file1 [file2...]
-- To decompress:    paq8pxd [-d] file1.paq8pxd [dir2]
-- To view contents: paq8pxd -l file1.paq8pxd
+- To compress:      `paq8pxd [-N] file1 [file2...]`
+- To decompress:    `paq8pxd [-d] file1.paq8pxd [dir2]`
+- To view contents: `paq8pxd -l file1.paq8pxd`
 
 The compressed output file is named by adding ".paq8pxd" extension to
 the first named file (file1.paq8pxd).  Each file that exists will be
@@ -46,13 +53,13 @@ files and subdirectories are compressed, preserving the directory
 structure, except that empty directories are not stored, and file
 attributes (timestamps, permissions, etc.) are not preserved.
 During extraction, directories are created as needed.  For example:
-
+```sh
   paq8pxd -4 c:\tmp\foo bar
-
+```
 compresses foo and bar (if they exist) to c:\tmp\foo.paq8pxd at level 4.
-
+```sh
   paq8pxd -d c:\tmp\foo.paq8pxd .
-
+```
 extracts foo and compares bar in the current directory.  If foo and bar
 are directories then their contents are extracted/compared.
 
@@ -63,23 +70,29 @@ File names with nonprintable characters are not supported (spaces
 are OK).
 
 
-# TO COMPILE
+## TO COMPILE
 
 Make sure bzip2 libraries are present
 
   MINGW g++
+```sh
     pacman -S mingw-w64-x86_64-bzip2
+```
 
   UNIX/Linux
+```
     sudo apt-get install libbz2-dev
+```
 
 There are 2 files: paq8pxd.cpp (C++) and wrtpre.cpp (C++).
 paq8pxd.cpp recognizes the following compiler options:
 
+```
   -DWINDOWS           (to compile in Windows)
   -DUNIX              (to compile in Unix, Linux, etc)
   -DMT                (to compile with multithreading support)
   -DDEFAULT_OPTION=N  (to change the default compression level from 5 to N).
+```
 
 If you compile without -DWINDOWS or -DUNIX, you can still compress files,
 but you cannot compress directories or create them during extraction.
@@ -95,41 +108,57 @@ Recommended compiler commands and optimizations:
 
   MINGW g++ (x86,x64):  
    with multithreading:  
-    g++ paq8pxd.cpp -DWINDOWS -DMT -msse2 -O3 -s -static -lz -lbz2 -o paq8pxd.exe   
+```sh
+    g++ paq8pxd.cpp -DWINDOWS -DMT -msse2 -O3 -s -static -lz -lbz2 -o paq8pxd.exe
+```
    without multithreading:  
+```sh
     g++ paq8pxd.cpp -DWINDOWS -msse2 -O3 -s -static -lz -lbz2 -o paq8pxd.exe 
+```
 
   UNIX/Linux (PC x86,x64):  
    with multithreading:  
+```sh
     g++ paq8pxd.cpp -DUNIX -DMT -msse2 -O3 -s -static -lpthread -lz -lbz2 -o paq8pxd  
+```
    without multithreading:  
+```sh
     g++ paq8pxd.cpp -DUNIX -msse2 -O3 -s -static -lpthread -lz -lbz2 -o paq8pxd
+```
 
   Non PC (e.g. PowerPC under MacOS X):  
     g++ paq8pxd.cpp -O2 -DUNIX -s -lz -lbz2 -o paq8pxd
 
 Alternatively, you can use CMake to build paq8pxd.
 
-CMake recognizes the following compiler options for paq8pxd:  
+CMake recognizes the following compiler options for `paq8pxd`:  
+```
   -DUNIX: Whether to build for Unix. Otherwise, build for Windows)  
   -DNATIVECPU: Whether to build for your cpu (vs. the general public). Default is OFF)  
   -DMT: Whether to enable Multithreading. Default is OFF)  
   -DDISABLE_SM: Whether to disable faster statemaps. Default is OFF)  
-  
+```
+
 To build for Windows in MinGW with Multithreading and build a native executable for your CPU:  
+```sh
 cmake . -G "MSYS Makefiles" -DMT=ON -DNATIVECPU=ON
+```
 
 To build for Unix systems with Multithreading and build a native executable for your CPU:  
+```
 cmake . -DUNIX=ON -DMT=ON -DNATIVECPU=ON
+```
 
 Then build with make:  
+```
 make
+```
 
-
-# ARCHIVE FILE FORMAT
+## ARCHIVE FILE FORMAT
 
 An archive has the following format.  
 
+```sh
   paq8pxd -N 
   segment size 
   compressed segment size
@@ -158,37 +187,38 @@ type size info
 type size 
 type size info
 .....
+```
 
 info is present if block type needs extra info like in image or audio.
 
 Plain file names are stored without a path.  Files in compressed
 directories are stored with path relative to the compressed directory
 (using UNIX style forward slashes "/").  For example, given these files:
-
+```
   123 C:\dir1\file1.txt
   456 C:\dir2\file2.txt
-
+```
 Then
-
+```sh
   paq8pxd archive \dir1\file1.txt \dir2
-
+```
 will create archive.paq8pxd 
 
 The command:
-
+```sh
   paq8pxd archive.paq8pxd C:\dir3
-
+```
 will create the files:
-
+```
   C:\dir3\file1.txt
   C:\dir3\dir2\file2.txt
-
-Decompression will fail if the first 10 bytes are not "paq8pxd -".  Sizes
+```
+Decompression will fail if the first 10 bytes are not `paq8pxd -`.  Sizes
 are stored as decimal numbers.  CR, LF, TAB are ASCII codes
 13, 10, 9 respectively.
 
 
-# ARITHMETIC CODING
+### ARITHMETIC CODING
 
 The binary data is arithmetic coded as the shortest base 256 fixed point
 number x = SUM_i x_i 256^-1-i such that p(<y) <= x < p(<=y), where y is the
@@ -203,37 +233,37 @@ bits of y, and y_j is the next bit.  Compression depends almost entirely
 on the ability to predict the next bit accurately.
 
 
-# MODEL MIXING
+## MODEL MIXING
 
 paq8pxd uses a neural network to combine a large number of models.  The
 i'th model independently predicts
-p1_i = p(y_j = 1 | y_0..j-1), p0_i = 1 - p1_i.
+`p1_i = p(y_j = 1 | y_0..j-1), p0_i = 1 - p1_i`.
 The network computes the next bit probabilty
-
+```
   p1 = squash(SUM_i w_i t_i), p0 = 1 - p1                        (1)
-
+```
 where t_i = stretch(p1_i) is the i'th input, p1_i is the prediction of
-the i'th model, p1 is the output prediction, stretch(p) = ln(p/(1-p)),
-and squash(s) = 1/(1+exp(-s)).  Note that squash() and stretch() are
+the i'th model, p1 is the output prediction, `stretch(p) = ln(p/(1-p))`,
+and `squash(s) = 1/(1+exp(-s))`.  Note that `squash()` and `stretch()` are
 inverses of each other.
 
 After bit y_j (0 or 1) is received, the network is trained:
-
+```
   w_i := w_i + eta t_i (y_j - p1)                                (2)
-
+```
 where eta is an ad-hoc learning rate, t_i is the i'th input, (y_j - p1)
 is the prediction error for the j'th input but, and w_i is the i'th
 weight.  Note that this differs from back propagation:
-
+```
   w_i := w_i + eta t_i (y_j - p1) p0 p1                          (3)
-
+```
 which is a gradient descent in weight space to minimize root mean square
 error.  Rather, the goal in compression is to minimize coding cost,
 which is -log(p0) if y = 1 or -log(p1) if y = 0.  Taking
 the partial derivative of cost with respect to w_i yields (2).
 
 
-# MODELS
+## MODELS
 
 Most models are context models.  A function of the context (last few
 bytes) is mapped by a lookup table or hash table to a state which depends
@@ -244,36 +274,36 @@ There are several types of bit history states:
 - Run Map. The state is (b,n) where b is the last bit seen (0 or 1) and
   n is the number of consecutive times this value was seen.  The initial
   state is (0,0).  The output is computed directly:
-
+```
     t_i = (2b - 1)K log(n + 1).
-
+```
   where K is ad-hoc, around 4 to 10.  When bit y_j is seen, the state
   is updated:
-
+```
     (b,n) := (b,n+1) if y_j = b, else (y_j,1).
-
+```
 - Stationary Map.  The state is p, initially 1/2.  The output is
   t_i = stretch(p).  The state is updated at ad-hoc rate K (around 0.01):
-
+```
     p := p + K(y_j - p)
-
+```
 - Nonstationary Map.  This is a compromise between a stationary map, which
   assumes uniform statistics, and a run map, which adapts quickly by
   discarding old statistics.  An 8 bit state represents (n0,n1,h), initially
   (0,0,0) where:
-
+```
     n0 is the number of 0 bits seen "recently".
     n1 is the number of 1 bits seen "recently".
     n = n0 + n1.
     h is the full bit history for 0 <= n <= 4,
       the last bit seen (0 or 1) if 5 <= n <= 15,
       0 for n >= 16.
-
+```
   The primaty output is t_i := stretch(sm(n0,n1,h)), where sm(.) is
   a stationary map with K = 1/256, initialized to
   sm(n0,n1,h) = (n1+(1/64))/(n+2/64).  Four additional inputs are also
   be computed to improve compression slightly:
-
+```
     p1_i = sm(n0,n1,h)
     p0_i = 1 - p1_i
     t_i   := stretch(p_1)
@@ -281,25 +311,26 @@ There are several types of bit history states:
     t_i+2 := K2 stretch(p1) if n0 = 0, -K2 stretch(p1) if n1 = 0, else 0
     t_i+3 := K3 (-p0_i if n1 = 0, p1_i if n0 = 0, else 0)
     t_i+4 := K3 (-p0_i if n0 = 0, p1_i if n1 = 0, else 0)
-
+```
   where K1..K4 are ad-hoc constants.
 
   h is updated as follows:
+```
     If n < 4, append y_j to h.
     Else if n <= 16, set h := y_j.
     Else h = 0.
-
+```
   The update rule is biased toward newer data in a way that allows
   n0 or n1, but not both, to grow large by discarding counts of the
   opposite bit.  Large counts are incremented probabilistically.
   Specifically, when y_j = 0 then the update rule is:
-
+```
     n0 := n0 + 1, n < 29
           n0 + 1 with probability 2^(27-n0)/2 else n0, 29 <= n0 < 41
           n0, n = 41.
     n1 := n1, n1 <= 5
           round(8/3 lg n1), if n1 > 5
-
+```
   swapping (n0,n1) when y_j = 1.
 
   Furthermore, to allow an 8 bit representation for (n0,n1,h), states
@@ -312,9 +343,9 @@ There are several types of bit history states:
 - Match Model.  The state is (c,b), initially (0,0), where c is 1 if
   the context was previously seen, else 0, and b is the next bit in
   this context.  The prediction is:
-
+```
     t_i := (2b - 1)Kc log(m + 1)
-
+```
   where m is the length of the context.  The update rule is c := 1,
   b := y_j.  A match model can be implemented efficiently by storing
   input in a buffer and storing pointers into the buffer into a hash
@@ -322,7 +353,7 @@ There are several types of bit history states:
   and b can be retrieved from the buffer.
 
 
-# CONTEXTS
+## CONTEXTS
 
 High compression is achieved by combining a large number of contexts.
 Most (not all) contexts start on a byte boundary and end on the bit
@@ -415,7 +446,7 @@ modeled with both a run map and a nonstationary map unless indicated.
   DMC.  The second predictor is a bit history state mapped adaptively to
   a probability as as in a Nonstationary Map.
 
-# ARCHITECTURE
+## ARCHITECTURE
 
 The context models are mixed by several of several hundred neural networks
 selected by a low-order context.  The outputs of these networks are
@@ -428,11 +459,11 @@ An APM is a stationary map combining a context and an input probability.
 The input probability is stretched and divided into 32 segments to
 combine with other contexts.  The output is interpolated between two
 adjacent quantized values of stretch(p1).  There are 2 APM stages in series:
-
+```
   p1 := (p1 + 3 APM(order 0, p1)) / 4.
   p1 := (APM(order 1, p1) + 2 APM(order 2, p1) + APM(order 3, p1)) / 4.
-
-# PREPROCESSING
+```
+## PREPROCESSING
 
 paq8pxd uses preprocessing transforms on certain data types to improve
 compression.  To improve reliability, the decoding transform is
@@ -506,7 +537,7 @@ The preprocessor has 3 parts:
 - MRB: 8 bit images with RLE compression
 
 
-# IMPLEMENTATION
+## IMPLEMENTATION
 
 Hash tables are designed to minimize cache misses, which consume most
 of the CPU time.
@@ -540,5 +571,5 @@ at a time.  Using assembler is 8 times faster than C++ for this code
 and 1/3 faster overall.  (However I found that SSE2 code on an AMD-64,
 which computes 8 elements at a time, is not any faster).
 
-# SEE ALSO
- paq8px https://github.com/hxim/paq8px
+## SEE ALSO
+ [paq8px](https://github.com/hxim/paq8px)

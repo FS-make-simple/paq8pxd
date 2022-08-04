@@ -34,7 +34,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "-O3 -floop-strip-mine -funroll-loops -ftree-vectorize -fgcse-sm -falign-loops=16")
 
-add_executable(paq8pxd paq8pxd.cpp)
+add_executable(paq8pxd src/paq8pxd.cpp)
 
 if (UNIX)
     if (MT)
